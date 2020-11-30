@@ -41,7 +41,7 @@ Clone and download the repository. Install all the above listed dependencies and
     git commit -am "deploying"
     git push heroku master
     ```
-***Note:*** Pass the **api_id** as an integer.\
+***Note:*** Pass the **api_id** as an integer.
 
 I know I've repeated my code atleast 2-3 times, I'll fix it later. Or you guys can contribute as well :).
 Thanks [Infinity-Plus](https://github.com/infinity-plus) for his help.
