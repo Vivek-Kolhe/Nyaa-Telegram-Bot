@@ -43,5 +43,8 @@ Clone and download the repository. Install all the above listed dependencies and
     ```
 ***Note:*** Pass the **api_id** as an integer.
 
-I know I've repeated my code atleast 2-3 times, I'll fix it later. Or you guys can contribute as well :).
+## Disclaimer
+**I do not host any of the torrents fetched by the API. The API is just meant to scrape the website and return the results. I do not promote piracy, this is just for educational purpose. If you guys can afford legal methods, then use them and support the industry :).**
+
+I know I've repeated my code atleast 2-3 times, I'll fix it later. Or you guys can contribute as well :).\
 Thanks [Infinity-Plus](https://github.com/infinity-plus) for his help.
