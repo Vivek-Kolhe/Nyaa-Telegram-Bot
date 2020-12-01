@@ -31,7 +31,7 @@ Clone and download the repository. Install all the above listed dependencies and
 - Clone and download the repository.
 - Get your telegram **api_id** and **api_hash** from https://my.telegram.org/ and pass them on line 12 and 13.
 - Get **bot_token** from [BotFather](https://t.me/BotFather) and pass it on the line 14.
-- Download **HerokuCLI** and create an from the dashboard.
+- Download **HerokuCLI** and create an app from the dashboard.
 - Navigate inside the directory where all the repo files are present and run the following commands.
     ```
     heroku login
