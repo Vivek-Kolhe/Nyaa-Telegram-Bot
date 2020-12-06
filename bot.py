@@ -3,19 +3,55 @@ from pyrogram import Client, filters
 import requests
 import logging
 from autologging import logged, traced
+from credentials import *
 
 # Enable logging
 logging.basicConfig(
     format= '%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=INFO)
 logger = logging.getLogger(__name__)
 
-api_id = int("")                                                  # pass your api_id here
-api_hash = ""                                                     # pass your api_hash here
-bot_token = ""                                                    # pass your bot_token here
-
-app = Client("my_bot", api_id = api_id, api_hash = api_hash, bot_token = bot_token)
+app = Client("my_bot", api_id = API_ID, api_hash = API_HASH, bot_token = BOT_TOKEN)
 with app:
     botname = app.get_me().username
+
+#####################################################################################################################
+# Common function for making request to the API
+#####################################################################################################################
+
+def get_data(query, client, message):
+    if len(query) == 1:
+        text = "No search query found!\nSend /help for help."
+        app.send_message(chat_id = message.chat.id, text = text, parse_mode = "html")
+    else:
+        if query[0][1:] == "eng":
+            url = f"https://nyaaapi.herokuapp.com/anime/search?query={query[-1]}&category=eng"
+        elif query[0][1:] == "non_eng":
+            url = f"https://nyaaapi.herokuapp.com/anime/search?query={query[-1]}&category=non-eng"
+        elif query[0][1:] == "raw":
+            url = f"https://nyaaapi.herokuapp.com/anime/search?query={query[-1]}&category=raw"
+        old_msg = app.send_message(chat_id = message.chat.id, text = "<b>Searching...</b>", parse_mode = "html")
+        response = requests.get(url).json()
+        if int(response["count"]) < 1:
+            text = "No results found!"
+            app.edit_message_text(chat_id = message.chat.id, message_id = old_msg.message_id, text = text, parse_mode = "html")
+        else:
+            data = response["data"]
+            text = ""
+            for i in range(20):
+                try:
+                    title = data[i]["title"]
+                    seeders = data[i]["seeders"]
+                    leechers = data[i]["leechers"]
+                    size = data[i]["size"]
+                    unique_id = data[i]["id"]
+
+                    text = text + f"<b>{title}</b>\n<b>ID: </b><code>{unique_id}</code>\n<b>Seeders/Leechers: </b>{seeders}/{leechers}\n<b>Size: </b>{size}\n\n"
+                    app.edit_message_text(chat_id = message.chat.id, message_id = old_msg.message_id, text = text, parse_mode = "html")
+                except:
+                    break
+            text = "Send **/magnet <unique_id>** from the above list to get the torrent info and magnet link."
+            app.send_message(chat_id = message.chat.id, text = text, parse_mode = "markdown")
+#####################################################################################################################
 
 # start command
 @traced
@@ -39,34 +75,7 @@ def help(client, message):
 @app.on_message(filters.command(["eng", f"eng@{botname}"], prefixes = "/") & ~filters.edited)
 def eng(client, message):
     query = message.text.split(maxsplit = 1)
-    if len(query) == 1:
-        text = "No search query found!\nSend /help for help."
-        app.send_message(chat_id = message.chat.id, text = text, parse_mode = "html")
-    else:
-        query = query[-1]
-        old_msg = app.send_message(chat_id = message.chat.id, text = "<b>Searching...</b>", parse_mode = "html")
-        response = requests.get(f"https://nyaaapi.herokuapp.com/anime/search?query={query}&category=eng").json()
-        if int(response["count"]) < 1:
-            text = "No results found!"
-            app.edit_message_text(chat_id = message.chat.id, message_id = old_msg.message_id, text = text, parse_mode = "html")
-        else:
-            data = response["data"]
-            text = ""
-            for i in range(20):
-                try:
-                    title = data[i]["title"]
-                    seeders = data[i]["seeders"]
-                    leechers = data[i]["leechers"]
-                    size = data[i]["size"]
-                    unique_id = data[i]["id"]
-
-                    text = text + f"<b>{title}</b>\n<b>ID: </b><code>{unique_id}</code>\n<b>Seeders/Leechers: </b>{seeders}/{leechers}\n<b>Size: </b>{size}\n\n"
-                    app.edit_message_text(chat_id = message.chat.id, message_id = old_msg.message_id, text = text, parse_mode = "html")
-                except:
-                    break
-            # app.edit_message_text(chat_id = message.chat.id, message_id = old_msg.message_id, text = text, parse_mode = "html")
-            text = "Send **/magnet <unique_id>** from the above list to get the torrent info and magnet link."
-            app.send_message(chat_id = message.chat.id, text = text, parse_mode = "markdown")
+    get_data(query, client, message)
 
 # commands for fetching non-english anime torrents
 @traced
@@ -74,34 +83,7 @@ def eng(client, message):
 @app.on_message(filters.command(["non_eng", f"non_eng@{botname}"], prefixes = "/") & ~filters.edited)
 def non_eng(client, message):
     query = message.text.split(maxsplit = 1)
-    if len(query) == 1:
-        text = "No search query found!\nSend /help for help."
-        app.send_message(chat_id = message.chat.id, text = text, parse_mode = "html")
-    else:
-        query = query[-1]
-        old_msg = app.send_message(chat_id = message.chat.id, text = "<b>Searching...</b>", parse_mode = "html")
-        response = requests.get(f"https://nyaaapi.herokuapp.com/anime/search?query={query}&category=non-eng").json()
-        if int(response["count"]) < 1:
-            text = "No results found!"
-            app.edit_message_text(chat_id = message.chat.id, message_id = old_msg.message_id, text = text, parse_mode = "html")
-        else:
-            data = response["data"]
-            text = ""
-            for i in range(20):
-                try:
-                    title = data[i]["title"]
-                    seeders = data[i]["seeders"]
-                    leechers = data[i]["leechers"]
-                    size = data[i]["size"]
-                    unique_id = data[i]["id"]
-
-                    text = text + f"<b>{title}</b>\n<b>ID: </b><code>{unique_id}</code>\n<b>Seeders/Leechers: </b>{seeders}/{leechers}\n<b>Size: </b>{size}\n\n"
-                    app.edit_message_text(chat_id = message.chat.id, message_id = old_msg.message_id, text = text, parse_mode = "html")
-                except:
-                    break
-            # app.send_message(chat_id = message.chat.id, text = text, parse_mode = "html")
-            text = "Send **/magnet <unique_id>** from the above list to get the torrent info and magnet link."
-            app.send_message(chat_id = message.chat.id, text = text, parse_mode = "markdown")
+    get_data(query, client, message)
 
 # command for fetching raw anime torrents
 @traced
@@ -109,34 +91,7 @@ def non_eng(client, message):
 @app.on_message(filters.command(["raw", f"raw@{botname}"], prefixes = "/") & ~filters.edited)
 def raw(client, message):
     query = message.text.split(maxsplit = 1)
-    if len(query) == 1:
-        text = "No search query found!\nSend /help for help."
-        app.send_message(chat_id = message.chat.id, text = text, parse_mode = "html")
-    else:
-        query = query[-1]
-        old_msg = app.send_message(chat_id = message.chat.id, text = "<b>Searching...</b>", parse_mode = "html")
-        response = requests.get(f"https://nyaaapi.herokuapp.com/anime/search?query={query}&category=raw").json()
-        if int(response["count"]) < 1:
-            text = "No results found!"
-            app.edit_message_text(chat_id = message.chat.id, message_id = old_msg.message_id, text = text, parse_mode = "html")
-        else:
-            data = response["data"]
-            text = ""
-            for i in range(20):
-                try:
-                    title = data[i]["title"]
-                    seeders = data[i]["seeders"]
-                    leechers = data[i]["leechers"]
-                    size = data[i]["size"]
-                    unique_id = data[i]["id"]
-
-                    text = text + f"<b>{title}</b>\n<b>ID: </b><code>{unique_id}</code>\n<b>Seeders/Leechers: </b>{seeders}/{leechers}\n<b>Size: </b>{size}\n\n"
-                    app.edit_message_text(chat_id = message.chat.id, message_id = old_msg.message_id, text = text, parse_mode = "html")
-                except:
-                    break
-            # app.send_message(chat_id = message.chat.id, text = text, parse_mode = "html")
-            text = "Send **/magnet <unique_id>** from the above list to get the torrent info and magnet link."
-            app.send_message(chat_id = message.chat.id, text = text, parse_mode = "markdown")
+    get_data(query, client, message)
 
 # command for magnet link and torrent info
 @traced
