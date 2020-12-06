@@ -29,6 +29,9 @@ def get_data(query, client, message):
             url = f"https://nyaaapi.herokuapp.com/anime/search?query={query[-1]}&category=non-eng"
         elif query[0][1:] == "raw":
             url = f"https://nyaaapi.herokuapp.com/anime/search?query={query[-1]}&category=raw"
+        elif query[0][1:] == "manga":
+            url = f"https://nyaaapi.herokuapp.com/manga/search?query={query[-1]}&category=eng"
+        
         old_msg = app.send_message(chat_id = message.chat.id, text = "<b>Searching...</b>", parse_mode = "html")
         response = requests.get(url).json()
         if int(response["count"]) < 1:
@@ -66,7 +69,7 @@ def start(client, message):
 @logged
 @app.on_message(filters.command(["help", f"help@{botname}"], prefixes = "/") & ~filters.edited)
 def help(client, message):
-    text = "**Note:** The bot will fetch some of the most recent torrents, so be specific with search query.\n**Available Commands:**\n/eng, /non_eng and /raw followed by anime name.\n/magnet followed by unique id to get torrent info and torrent.\n\nExamples:\n**/eng Attack on Titan**\n**/non_eng Attack on Titan**\n**/raw Attack on Titan**\n**/magnet 1234567**"
+    text = "**Note:** The bot will fetch some of the most recent torrents, so be specific with search query.\n**Available Commands:**\n/eng, /non_eng and /raw followed by anime name.\n/manga followed by manga name.\n/magnet followed by unique id to get torrent info and torrent.\n\nExamples:\n**/eng Attack on Titan**\n**/non_eng Attack on Titan**\n**/raw Attack on Titan**\n**/manga Attack on Titan**\n**/magnet 1234567**"
     app.send_message(chat_id = message.chat.id, text = text, parse_mode = "markdown")
 
 # command for fetching english anime torrents
@@ -90,6 +93,14 @@ def non_eng(client, message):
 @logged
 @app.on_message(filters.command(["raw", f"raw@{botname}"], prefixes = "/") & ~filters.edited)
 def raw(client, message):
+    query = message.text.split(maxsplit = 1)
+    get_data(query, client, message)
+
+# command for manga search
+@traced
+@logged
+@app.on_message(filters.command(["manga", f"manga@{botname}"], prefixes = "/") & ~filters.edited)
+def manga(client, message):
     query = message.text.split(maxsplit = 1)
     get_data(query, client, message)
 
