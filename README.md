@@ -19,13 +19,14 @@ A telegram bot made in python to fetch anime torrents from Nyaa.si. Bot uses [Ny
 |---|---|
 | ```/start``` | Starts the bot. |
 | ```/help``` | Help regarding the bot. |
-| ```/eng <query>``` | Searches for English translated anime. |
-| ```/non_eng <query>``` | Searches for Non-English anime. |
-| ```/raw <query>``` | Searches for raw anime. |
-| ```/manga <query>``` | Searches for manga. |
+| ```/anime <category> <query>``` | Returns anime torrents. |
+| ```/manga <category> <query>``` | Returns manga torrents. |
 | ```/magnet <unique_id>``` | Returns magnet link and torrent info. |
 
-***Note:*** Manga search will only return English translated manga results.
+**Available Categories:** ```eng```, ```non-eng``` and ```raw``` (works both for **/anime** and **/manga**.).
+
+***Note:*** You can omit search query to get most recent torrents of that particular category.\
+***Example:*** ```/anime eng```, ```/manga raw```
 
 ## Set-Up
 Clone and download the repository. Install all the above listed dependencies, put all your credentials in *credentials.py* and run ***bot.py*** using ```python3 bot.py```.
