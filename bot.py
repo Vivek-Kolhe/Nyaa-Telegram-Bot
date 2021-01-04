@@ -20,17 +20,19 @@ with app:
 
 def get_data(query, client, message):
     if len(query) == 1:
-        text = "No search query found!\nSend /help for help."
+        text = "Category or query missing!\nSend /help for help."
         app.send_message(chat_id = message.chat.id, text = text, parse_mode = "html")
     else:
-        if query[0][1:] == "eng":
-            url = f"https://nyaaapi.herokuapp.com/anime/search?query={query[-1]}&category=eng"
-        elif query[0][1:] == "non_eng":
-            url = f"https://nyaaapi.herokuapp.com/anime/search?query={query[-1]}&category=non-eng"
-        elif query[0][1:] == "raw":
-            url = f"https://nyaaapi.herokuapp.com/anime/search?query={query[-1]}&category=raw"
-        elif query[0][1:] == "manga":
-            url = f"https://nyaaapi.herokuapp.com/manga/search?query={query[-1]}&category=eng"
+        categories = ["eng", "non-eng", "raw"]
+        if query[1] in categories:
+            if query[0][1:] == "anime":
+                url = f"https://nyaaapi.herokuapp.com/anime/search?query={query[-1]}&category={query[1]}"
+            elif query[0][1:] == "manga":
+                url = f"https://nyaaapi.herokuapp.com/manga/search?query={query[-1]}&category={query[1]}"
+        else:
+            text = "Invalid category!\nCheck /help for more info."
+            app.send_message(chat_id = message.chat.id, text = text, parse_mode = "html")
+            return
         
         old_msg = app.send_message(chat_id = message.chat.id, text = "<b>Searching...</b>", parse_mode = "html")
         response = requests.get(url).json()
@@ -69,31 +71,15 @@ def start(client, message):
 @logged
 @app.on_message(filters.command(["help", f"help@{botname}"], prefixes = "/") & ~filters.edited)
 def help(client, message):
-    text = "**Note:** The bot will fetch some of the most recent torrents, so be specific with search query.\n**Available Commands:**\n/eng, /non_eng and /raw followed by anime name.\n/manga followed by manga name.\n/magnet followed by unique id to get torrent info and torrent.\n\nExamples:\n**/eng Attack on Titan**\n**/non_eng Attack on Titan**\n**/raw Attack on Titan**\n**/manga Attack on Titan**\n**/magnet 1234567**"
+    text = "**Note:** The bot will fetch some of the most recent torrents, so be specific with search query.\nYou can omit search query to get most recent torrents.\n**Available Categories: eng, non-eng, raw**\n**Available Commands:**\n/anime and /manga followed by category and search query.\n/magnet followed by unique id to get torrent info and torrent.\n\nExamples:\n**/anime eng Attack on Titan**\n**/anime non-eng Attack on Titan**\n**/anime raw Attack on Titan**\n**/manga eng Attack on Titan**\n**/manga non-eng Attack on Titan**\n**/manga raw Attack on Titan**\n**/magnet 1234567**"
     app.send_message(chat_id = message.chat.id, text = text, parse_mode = "markdown")
 
-# command for fetching english anime torrents
+# command for anime search
 @traced
 @logged
-@app.on_message(filters.command(["eng", f"eng@{botname}"], prefixes = "/") & ~filters.edited)
-def eng(client, message):
-    query = message.text.split(maxsplit = 1)
-    get_data(query, client, message)
-
-# commands for fetching non-english anime torrents
-@traced
-@logged
-@app.on_message(filters.command(["non_eng", f"non_eng@{botname}"], prefixes = "/") & ~filters.edited)
-def non_eng(client, message):
-    query = message.text.split(maxsplit = 1)
-    get_data(query, client, message)
-
-# command for fetching raw anime torrents
-@traced
-@logged
-@app.on_message(filters.command(["raw", f"raw@{botname}"], prefixes = "/") & ~filters.edited)
-def raw(client, message):
-    query = message.text.split(maxsplit = 1)
+@app.on_message(filters.command(["anime", f"anime@{botname}"], prefixes = "/") & ~filters.edited)
+def anime(client, message):
+    query = message.text.split(maxsplit = 2)
     get_data(query, client, message)
 
 # command for manga search
@@ -101,7 +87,7 @@ def raw(client, message):
 @logged
 @app.on_message(filters.command(["manga", f"manga@{botname}"], prefixes = "/") & ~filters.edited)
 def manga(client, message):
-    query = message.text.split(maxsplit = 1)
+    query = message.text.split(maxsplit = 2)
     get_data(query, client, message)
 
 # command for magnet link and torrent info
