@@ -35,5 +35,5 @@ Clone and download the repository. Install all the above listed dependencies, pu
 
 ~~I know I've repeated my code atleast 2-3 times, I'll fix it later.~~\
 ~~Repeated code has been fixed now and **manga search** is also added.~~\
-Now supports each and every single category and sub category of torrents from Nyaa and Sukebei.
+Now supports each and every single category and sub category of torrents from Nyaa and Sukebei.\
 Thanks [Infinity-Plus](https://github.com/infinity-plus) for his help.
